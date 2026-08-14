@@ -9,6 +9,14 @@ export const CATEGORIA_LABEL: Record<CategoriaGramatical, string> = {
   adverbio: 'Adverbio',
 }
 
+export const CATEGORIA_ABREV: Record<CategoriaGramatical, string> = {
+  sustantivo: 'sust.',
+  verbo: 'vb.',
+  adjetivo: 'adj.',
+  adverbio: 'adv.',
+}
+
+
 export interface Libro {
   id: string
   titulo: string

@@ -111,167 +111,158 @@ export function CapturaRapida({
     }
   }
 
-  const libroActivo = libros.find((l) => l.id === libroActivoId) ?? null
-
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-8">
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1">
-          <select
-            value={libroActivoId ?? ''}
-            onChange={(e) => setLibroActivoId(e.target.value || null)}
-            className="w-full appearance-none rounded-md border border-line bg-paper-raised px-3 py-2 pr-9 text-sm text-ink outline-none focus:border-accent"
-          >
-            <option value="">Sin libro activo</option>
-            {librosActivos.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.titulo}
-                {l.autor ? ` — ${l.autor}` : ''}
-              </option>
-            ))}
-          </select>
-          <ChevronDown
-            size={16}
-            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint"
-          />
-        </div>
-        <button
-          type="button"
-          onClick={() => setModalLibroAbierto(true)}
-          className="flex shrink-0 items-center gap-1 rounded-md border border-line bg-paper-raised px-3 py-2 text-sm font-medium text-ink-soft hover:border-accent hover:text-accent"
-        >
-          <Plus size={16} />
-          nuevo libro
-        </button>
-      </div>
-      {!libroActivo && (
-        <p className="-mt-4 text-xs text-ink-faint">
-          No hay libro activo. Las palabras se guardarán sin libro asociado.
-        </p>
-      )}
+    <div className="mx-auto flex w-full max-w-xl flex-col px-5 pt-6">
+      <form onSubmit={handleSubmit} className="flex flex-col">
+        {/* The giant word -- the whole point of the screen. Nothing else competes with it. */}
+        <input
+          ref={palabraInputRef}
+          autoFocus
+          value={form.palabra}
+          onChange={(e) => setForm((f) => ({ ...f, palabra: e.target.value }))}
+          className="font-display w-full bg-transparent text-6xl font-bold tracking-tight text-ink outline-none placeholder:text-ink-faint/40"
+          placeholder="efímero"
+          required
+        />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-ink-soft">Palabra</span>
-          <input
-            ref={palabraInputRef}
-            autoFocus
-            value={form.palabra}
-            onChange={(e) => setForm((f) => ({ ...f, palabra: e.target.value }))}
-            className="rounded-md border border-line bg-paper-raised px-3 py-2 font-display text-lg text-ink outline-none focus:border-accent"
-            placeholder="efímero"
-            required
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-ink-soft">Categoría gramatical</span>
-          <select
-            value={form.categoria}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, categoria: e.target.value as CategoriaGramatical }))
-            }
-            className="rounded-md border border-line bg-paper-raised px-3 py-2 text-ink outline-none focus:border-accent"
-          >
-            {CATEGORIAS.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORIA_LABEL[c]}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-ink-soft">Definición</span>
-          <textarea
-            value={form.definicion}
-            onChange={(e) => setForm((f) => ({ ...f, definicion: e.target.value }))}
-            className="min-h-20 rounded-md border border-line bg-paper-raised px-3 py-2 text-ink outline-none focus:border-accent"
-            placeholder="Que dura poco tiempo."
-            required
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-ink-soft">Página o capítulo</span>
-          <input
-            value={form.paginaOCapitulo}
-            onChange={(e) => setForm((f) => ({ ...f, paginaOCapitulo: e.target.value }))}
-            className="rounded-md border border-line bg-paper-raised px-3 py-2 text-ink outline-none focus:border-accent"
-            placeholder="p. 214 / cap. 3"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1">
-          <span className="text-sm font-medium text-ink-soft">Oración original</span>
-          <textarea
-            value={form.oracionOriginal}
-            onChange={(e) => setForm((f) => ({ ...f, oracionOriginal: e.target.value }))}
-            className="min-h-16 rounded-md border border-line bg-paper-raised px-3 py-2 text-ink outline-none focus:border-accent"
-            placeholder="Frase del libro donde apareció la palabra…"
-          />
-        </label>
-
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-ink-soft">Imagen (opcional)</span>
-          {imagenPreview ? (
-            <div className="relative w-fit">
-              <img
-                src={imagenPreview}
-                alt="Vista previa"
-                className="h-28 w-28 rounded-md border border-line object-cover"
-              />
-              <button
-                type="button"
-                onClick={limpiarImagen}
-                className="absolute -right-2 -top-2 rounded-full bg-ink p-1 text-paper-raised"
-                aria-label="Quitar imagen"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          ) : (
-            <div
-              onDragOver={(e) => {
-                e.preventDefault()
-                setArrastrando(true)
-              }}
-              onDragLeave={() => setArrastrando(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`flex cursor-pointer flex-col items-center justify-center gap-1 rounded-md border-2 border-dashed px-4 py-6 text-center text-sm transition-colors ${
-                arrastrando
-                  ? 'border-accent bg-accent-dim text-accent'
-                  : 'border-line text-ink-faint hover:border-accent-soft hover:text-accent-soft'
+        <div className="segmented mt-5 w-fit">
+          {CATEGORIAS.map((c) => (
+            <button
+              key={c}
+              type="button"
+              aria-pressed={form.categoria === c}
+              onClick={() => setForm((f) => ({ ...f, categoria: c }))}
+              className={`px-3 py-1.5 text-[13px] font-medium transition-all ${
+                form.categoria === c
+                  ? 'bg-paper-raised text-ink shadow-sm'
+                  : 'text-ink-soft hover:text-ink'
               }`}
             >
-              <ImagePlus size={20} />
-              <span>Arrastra una imagen o haz clic para elegirla</span>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => elegirArchivo(e.target.files?.[0] ?? null)}
-              />
-            </div>
-          )}
-          {!imagenFile && (
-            <input
-              value={imagenUrlInput}
-              onChange={(e) => setImagenUrlInput(e.target.value)}
-              className="rounded-md border border-line bg-paper-raised px-3 py-2 text-sm text-ink outline-none focus:border-accent"
-              placeholder="…o pega la URL de una imagen"
-            />
-          )}
+              {CATEGORIA_LABEL[c]}
+            </button>
+          ))}
         </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        <div className="mt-7 flex flex-col divide-y divide-line">
+          <div className="flex items-center justify-between gap-2 py-3">
+            <span className="shrink-0 text-[15px] text-ink-soft">Libro</span>
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-1">
+              <select
+                value={libroActivoId ?? ''}
+                onChange={(e) => setLibroActivoId(e.target.value || null)}
+                className="min-w-0 max-w-full bg-transparent text-right text-[15px] text-ink outline-none"
+              >
+                <option value="">Ninguno</option>
+                {librosActivos.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.titulo}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="shrink-0 text-ink-faint" />
+              <button
+                type="button"
+                onClick={() => setModalLibroAbierto(true)}
+                aria-label="Agregar libro nuevo"
+                className="shrink-0 p-1 text-accent"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1 py-3">
+            <span className="text-[15px] text-ink-soft">Definición</span>
+            <textarea
+              value={form.definicion}
+              onChange={(e) => setForm((f) => ({ ...f, definicion: e.target.value }))}
+              className="min-h-16 w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-faint"
+              placeholder="Que dura poco tiempo."
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2 py-3">
+            <span className="shrink-0 text-[15px] text-ink-soft">Página o capítulo</span>
+            <input
+              value={form.paginaOCapitulo}
+              onChange={(e) => setForm((f) => ({ ...f, paginaOCapitulo: e.target.value }))}
+              className="min-w-0 flex-1 bg-transparent text-right text-[15px] text-ink outline-none placeholder:text-ink-faint"
+              placeholder="p. 214 / cap. 3"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1 py-3">
+            <span className="text-[15px] text-ink-soft">Oración original</span>
+            <textarea
+              value={form.oracionOriginal}
+              onChange={(e) => setForm((f) => ({ ...f, oracionOriginal: e.target.value }))}
+              className="min-h-14 w-full bg-transparent text-[15px] text-ink outline-none placeholder:text-ink-faint"
+              placeholder="Frase del libro donde apareció la palabra…"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2 py-3">
+            <span className="text-[15px] text-ink-soft">Imagen</span>
+            {imagenPreview ? (
+              <div className="relative w-fit">
+                <img
+                  src={imagenPreview}
+                  alt="Vista previa"
+                  className="h-24 w-24 rounded-xl object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={limpiarImagen}
+                  className="absolute -right-2 -top-2 rounded-full bg-ink p-1 text-white"
+                  aria-label="Quitar imagen"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            ) : (
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setArrastrando(true)
+                }}
+                onDragLeave={() => setArrastrando(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`flex cursor-pointer items-center gap-2 rounded-xl border border-dashed px-3 py-3 text-[13px] transition-colors ${
+                  arrastrando
+                    ? 'border-accent bg-accent-dim text-accent'
+                    : 'border-line-soft text-ink-faint hover:border-accent hover:text-accent'
+                }`}
+              >
+                <ImagePlus size={18} />
+                <span>Arrastra una imagen o haz clic para elegirla</span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => elegirArchivo(e.target.files?.[0] ?? null)}
+                />
+              </div>
+            )}
+            {!imagenFile && (
+              <input
+                value={imagenUrlInput}
+                onChange={(e) => setImagenUrlInput(e.target.value)}
+                className="bg-transparent text-[13px] text-ink outline-none placeholder:text-ink-faint"
+                placeholder="…o pega la URL de una imagen"
+              />
+            )}
+          </div>
+        </div>
+
+        {error && <p className="mt-3 text-sm text-danger">{error}</p>}
 
         <button
           type="submit"
           disabled={guardando || !form.palabra.trim() || !form.definicion.trim()}
-          className="mt-2 rounded-md bg-accent px-4 py-3 text-sm font-semibold text-paper-raised transition-colors hover:bg-accent-soft disabled:opacity-50"
+          className="mt-6 rounded-xl bg-accent py-3.5 text-[15px] font-semibold text-white transition-colors hover:bg-accent-soft disabled:opacity-40"
         >
           {guardando ? 'Guardando…' : confirmacion ? 'Guardado ✓' : 'Guardar'}
         </button>

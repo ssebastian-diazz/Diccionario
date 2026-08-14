@@ -26,14 +26,14 @@ export function GestionLibros({ libros, palabras, agregarLibro, editarLibro, onV
 
   function Fila({ libro }: { libro: Libro }) {
     return (
-      <li className="flex items-center gap-3 p-4">
+      <li className="flex items-center gap-3 py-3">
         <button
           type="button"
           onClick={() => onVerLibro(libro.id)}
           className="flex min-w-0 flex-1 flex-col items-start text-left"
         >
-          <span className="font-display text-base font-semibold text-ink">{libro.titulo}</span>
-          <span className="text-sm text-ink-faint">
+          <span className="font-display text-[17px] font-semibold text-ink">{libro.titulo}</span>
+          <span className="mt-0.5 text-[13px] text-ink-soft">
             {libro.autor ?? 'Autor desconocido'} · {conteoPorLibro.get(libro.id) ?? 0} palabra
             {(conteoPorLibro.get(libro.id) ?? 0) === 1 ? '' : 's'}
           </span>
@@ -41,61 +41,63 @@ export function GestionLibros({ libros, palabras, agregarLibro, editarLibro, onV
         <button
           type="button"
           onClick={() => setLibroEditando(libro)}
-          className="rounded p-2 text-ink-faint hover:bg-line-soft hover:text-ink"
+          className="p-2 text-ink-faint hover:text-accent"
           aria-label={`Editar ${libro.titulo}`}
         >
-          <Pencil size={15} />
+          <Pencil size={16} />
         </button>
         <button
           type="button"
           onClick={() => editarLibro(libro.id, { activo: !libro.activo })}
-          className="rounded p-2 text-ink-faint hover:bg-line-soft hover:text-ink"
+          className="p-2 text-ink-faint hover:text-accent"
           aria-label={libro.activo ? `Archivar ${libro.titulo}` : `Reactivar ${libro.titulo}`}
         >
-          {libro.activo ? <Archive size={15} /> : <ArchiveRestore size={15} />}
+          {libro.activo ? <Archive size={16} /> : <ArchiveRestore size={16} />}
         </button>
       </li>
     )
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-8 px-4 py-8">
-      <div className="flex items-center justify-between">
-        <h1 className="font-display text-xl font-semibold text-ink">Libros</h1>
+    <div className="mx-auto flex w-full max-w-2xl flex-col px-5 pt-6">
+      <div className="mb-4 flex items-center justify-between">
+        <h1 className="font-display text-[28px] font-bold text-ink">Libros</h1>
         <button
           type="button"
           onClick={() => setModalAbierto(true)}
-          className="flex items-center gap-1 rounded-md bg-accent px-3 py-2 text-sm font-medium text-paper-raised hover:bg-accent-soft"
+          aria-label="Agregar libro"
+          className="rounded-full p-1.5 text-accent hover:bg-accent-dim"
         >
-          <Plus size={16} />
-          Agregar libro
+          <Plus size={22} strokeWidth={2.2} />
         </button>
       </div>
 
       {libros.length === 0 && (
-        <p className="py-12 text-center text-ink-faint">Todavía no agregaste ningún libro.</p>
+        <p className="py-16 text-center text-[15px] text-ink-soft">
+          Todavía no agregaste ningún libro.
+        </p>
       )}
 
-      {activos.length > 0 && (
-        <ul className="flex flex-col divide-y divide-line-soft rounded-lg border border-line bg-paper-raised">
-          {activos.map((l) => (
-            <Fila key={l.id} libro={l} />
-          ))}
-        </ul>
-      )}
-
-      {archivados.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-faint">
-            Archivados
-          </h2>
-          <ul className="flex flex-col divide-y divide-line-soft rounded-lg border border-line bg-paper-raised opacity-70">
-            {archivados.map((l) => (
+      <div className="flex flex-col gap-8">
+        {activos.length > 0 && (
+          <ul className="flex flex-col divide-y divide-line">
+            {activos.map((l) => (
               <Fila key={l.id} libro={l} />
             ))}
           </ul>
-        </section>
-      )}
+        )}
+
+        {archivados.length > 0 && (
+          <section>
+            <h2 className="mb-1 text-[13px] font-semibold uppercase text-ink-soft">Archivados</h2>
+            <ul className="flex flex-col divide-y divide-line opacity-60">
+              {archivados.map((l) => (
+                <Fila key={l.id} libro={l} />
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
 
       {modalAbierto && (
         <NuevoLibroModal
