@@ -7,6 +7,7 @@ import { CapturaRapida } from './components/CapturaRapida'
 import { Diccionario } from './components/Diccionario'
 import { GestionLibros } from './components/GestionLibros'
 import { LibroDetalle } from './components/LibroDetalle'
+import { UndoToast } from './components/UndoToast'
 
 type Tab = 'captura' | 'diccionario' | 'libros'
 
@@ -22,7 +23,8 @@ function App() {
 
   const { libros, agregarLibro, editarLibro } = useLibros()
   const { libroActivoId, setLibroActivoId } = useLibroActivo(libros)
-  const { palabras, loading, refetch, eliminarPalabra } = usePalabras()
+  const { palabras, loading, refetch, eliminarPalabra, deshacerEliminar, pendientesEliminar } =
+    usePalabras()
 
   function irATab(t: Tab) {
     setLibroDetalleId(null)
@@ -42,6 +44,8 @@ function App() {
                 key={id}
                 type="button"
                 onClick={() => irATab(id)}
+                aria-label={label}
+                aria-current={tab === id && !libroDetalleId ? 'page' : undefined}
                 className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   tab === id && !libroDetalleId
                     ? 'bg-accent text-paper-raised'
@@ -89,6 +93,19 @@ function App() {
           />
         )}
       </main>
+
+      {pendientesEliminar.length > 0 && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex flex-col items-center gap-2 px-4">
+          {pendientesEliminar.map((p) => (
+            <div key={p.id} className="pointer-events-auto">
+              <UndoToast
+                mensaje={`«${p.palabra}» eliminada`}
+                onDeshacer={() => deshacerEliminar(p.id)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
